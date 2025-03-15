@@ -251,7 +251,7 @@ target_include_directories(msg_handler
 )
 
 # model_gen_signal library
- set(MODEL_GEN_SIGNAL_SOURCES
+set(MODEL_GEN_SIGNAL_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/model_gen_signal.c
   ${CMAKE_CURRENT_SOURCE_DIR}/include/model_gen_signal.h
 )
@@ -272,3 +272,13 @@ target_link_libraries(model_gen_signal
   msg_handler
   midi_msg
 )
+
+set(HASH_MAP_TEST_SRC
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_scripts/hash_map_test.c
+  )
+
+add_executable(hash_map_test)
+target_sources(hash_map_test
+ PRIVATE
+  ${HASH_MAP_TEST_SRC}
+  )
