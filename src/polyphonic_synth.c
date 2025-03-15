@@ -60,6 +60,8 @@ int main(void) {
     int octave = 3;
 
     MsgHdl msg_hdl = {0};
+    // TODO somehing like a hashmap for multiple MidiMsgs
+    // improve set_midi_msg
     MidiMsg midi_msg_in = {0};
 
     msg_hdl_add_key2fct(&msg_hdl, "adsr_height", set_float_value, (void*)&adsr_height);
