@@ -95,7 +95,7 @@ int main(void) {
 
         int ret_vol = lf_queue_push(&thread_stuff->model_msg_queue, "vol", (void*)&ui_stuff->text.vol, sizeof(float));
 
-        /* TODO check if polyphon affects this
+        // TODO check if polyphon affects this
         if (is_virt_keyboard_on != is_virt_keyboard_on_prev) {
             MidiMsg midi_msg_out = {
                 .key  = virt_keyboard_key + octave*12,
@@ -104,7 +104,7 @@ int main(void) {
                 .time_stamp = 0
             };
             int ret_midi_msg = lf_queue_push(&thread_stuff->model_msg_queue, "midi_msg", (void*)&midi_msg_out, sizeof(MidiMsg));
-        }*/
+        }
 
         if (jack_stuff->ringbuffer_video) {
             float output_buffer[1024];
@@ -151,8 +151,10 @@ int main(void) {
         size_t dummy_key_in = 0;
         bool dummy_pressed_in = false;
         octave_widget(layout_stack_slot(&ls),
-                      &dummy_key,
-                      &dummy_pressed,
+                      // &dummy_key,
+                      &virt_keyboard_key,
+                      // &dummy_pressed,
+                      &is_virt_keyboard_on,
                       dummy_key_in,
                       dummy_pressed_in);
 

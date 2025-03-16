@@ -241,7 +241,7 @@ void oct_trans_button_widget(UiRect r, int *octave, bool *left_is_pressed, bool 
             *octave = (*octave <= 0) ? 0 : (*octave - 1);
         }
     }
-    printf("octave: %d\n", *octave);
+    // printf("octave: %d\n", *octave);
     right_inner_color = right[*octave];
     right_outer_color = ColorBrightness(right[*octave], -0.5);
     left_inner_color = left[*octave];

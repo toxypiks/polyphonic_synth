@@ -11,6 +11,47 @@
 #include "midi_msg.h"
 #include <math.h>
 
+#define STB_DS_IMPLEMENTATION
+#include "stb_ds.h"
+
+typedef struct MidiMsgMap {
+    int key;
+    MidiMsg value;
+} MidiMsgMap;
+
+void set_midi_msg_in_map(void* midi_msg_new_raw, void* midi_msg_map_raw)
+{
+    MidiMsgMap** midi_msg_map = midi_msg_map_raw;
+    // get key from midi_msg
+    MidiMsg* midi_msg_new = midi_msg_new_raw;
+    int key = midi_msg_new->key;
+
+    // is it a new key?
+    int index = hmgeti(*midi_msg_map, key);
+    printf("set_midi_msg_in_map index: %d \n", index);
+    if (index < 0) {
+        // create new entry
+        hmput(*midi_msg_map, key, *midi_msg_new);
+    } else {
+        (*midi_msg_map)[index].value.is_on = midi_msg_new->is_on;
+    }
+    // TODO delete???
+    // tomorrow :)
+}
+
+void print_hash_map(MidiMsgMap* midi_msg_map)
+{
+    int midi_msg_map_len = hmlen(midi_msg_map);
+    printf("midi_msg_map %d items\n",midi_msg_map_len);
+    if (midi_msg_map_len > 0) {
+        for (size_t i = 0; i < midi_msg_map_len; ++i) {
+            printf("key: %d, is on: %d\n", midi_msg_map[i].key, midi_msg_map[i].value.is_on);
+        }
+    } else {
+        printf("nothing\n");
+    }
+}
+
 void set_adsr_values(void* adsr_new_raw, void* adsr_values_raw)
 {
     ADSR* adsr_values = (ADSR*)adsr_values_raw;
@@ -34,6 +75,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
 
     // TODO need MIDI msg hash map
     MidiMsg midi_msg = {0};
+    MidiMsgMap* midi_msg_map = NULL;
 
     MsgHdl msg_hdl = {0};
     float adsr_height = 0.0;
@@ -41,7 +83,8 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
 
     msg_hdl_add_key2fct(&msg_hdl, "adsr", set_adsr_values, (void*)&adsr_values);
     msg_hdl_add_key2fct(&msg_hdl, "vol", set_float_value, (void*)&vol);
-    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg, (void*)&midi_msg);
+//    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg, (void*)&midi_msg);
+    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg_in_map, (void*)&midi_msg_map);
 
     while(thread_stuff->is_running) {
         msg_hdling(&msg_hdl, &thread_stuff->model_msg_queue);
@@ -85,7 +128,9 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
         } else {
             usleep(2000);
         }
+        print_hash_map(midi_msg_map);
     }
+    hmfree(midi_msg_map);
     synth_model_clear(synth_model);
     printf("model_gen_signal_thread ended, Good bye! \n");
     return NULL;
