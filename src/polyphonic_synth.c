@@ -95,6 +95,7 @@ int main(void) {
 
         int ret_vol = lf_queue_push(&thread_stuff->model_msg_queue, "vol", (void*)&ui_stuff->text.vol, sizeof(float));
 
+        /* TODO check if polyphon affects this
         if (is_virt_keyboard_on != is_virt_keyboard_on_prev) {
             MidiMsg midi_msg_out = {
                 .key  = virt_keyboard_key + octave*12,
@@ -103,7 +104,7 @@ int main(void) {
                 .time_stamp = 0
             };
             int ret_midi_msg = lf_queue_push(&thread_stuff->model_msg_queue, "midi_msg", (void*)&midi_msg_out, sizeof(MidiMsg));
-        }
+        }*/
 
         if (jack_stuff->ringbuffer_video) {
             float output_buffer[1024];
@@ -138,13 +139,22 @@ int main(void) {
         layout_stack_pop(&ls);
         signal_widget(layout_stack_slot(&ls), &ray_out_buffer, BLUE);
         layout_stack_push(&ls, LO_HORZ, layout_stack_slot(&ls), 3, 0);
-        adsr_widget(layout_stack_slot(&ls), &ui_stuff->adsr, adsr_height, adsr_length);
+
+        // need poly adsr height/length
+        float dummy_adsr_height = 0.0;
+        float dummy_adsr_length = 0.0;
+        adsr_widget(layout_stack_slot(&ls), &ui_stuff->adsr, dummy_adsr_height, dummy_adsr_length);
         is_virt_keyboard_on_prev = is_virt_keyboard_on;
+        // TODO translate to poly midi msgs
+        size_t dummy_key;
+        bool dummy_pressed;
+        size_t dummy_key_in = 0;
+        bool dummy_pressed_in = false;
         octave_widget(layout_stack_slot(&ls),
-                      &virt_keyboard_key,
-                      &is_virt_keyboard_on,
-                      midi_msg_in.key - octave*12,
-                      midi_msg_in.is_on);
+                      &dummy_key,
+                      &dummy_pressed,
+                      dummy_key_in,
+                      dummy_pressed_in);
 
         slider_widget(layout_stack_slot(&ls), &ui_stuff->slider_vol);
         //slider_widget(layout_stack_slot(&ls), &ui_stuff->slider_freq);

@@ -53,6 +53,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
         if(num_bytes < 4800 * sizeof(float))
         {
             adsr_length = 0;
+            /* TODO need to handle polyphonic MidiMsgs
             synth_model_envelope_update(synth_model,
                                         adsr_values.attack,
                                         adsr_values.decay,
@@ -61,6 +62,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                                         //is_play_pressed);
                                         midi_msg.is_on);
 
+            // TODO
             synth_model_update(synth_model,
                                data_buf,
                                vol,
@@ -68,6 +70,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                                440.0 * pow(2.0, (midi_msg.key - 33.0)/12.0),
                                &adsr_height,
                                &adsr_length);
+            */
 
             // TODO msg send in better function
             int ret_adsr_height = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_height", (void*)&adsr_height, sizeof(float));
