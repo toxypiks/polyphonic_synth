@@ -10,12 +10,13 @@ typedef struct SynthModel{
 } SynthModel;
 
 SynthModel* create_synth_model();
-void synth_model_update(SynthModel* synth_model,
-                        float* signal_buffer,
-                        float new_vol,
-                        float new_freq,
-                        float* adsr_current_value,
-                        float* adsr_length
+
+void synth_model_process(SynthModel* synth_model,
+                         float* signal_sum_buffer,
+                         float* signal_prod_buffer,
+                         float new_vol,
+                         float* adsr_current_value,
+                         float* adsr_length
   );
 
 void synth_model_envelope_update(SynthModel* synth_model,

@@ -10,6 +10,7 @@
 #include "msg_handler.h"
 #include "midi_msg.h"
 #include <math.h>
+#include "tone_handler.h"
 
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
@@ -76,6 +77,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
     // TODO need MIDI msg hash map
     MidiMsg midi_msg = {0};
     MidiMsgMap* midi_msg_map = NULL;
+    ToneHandler tone_handler = { .tone_map = NULL };
 
     MsgHdl msg_hdl = {0};
     float adsr_height = 0.0;
@@ -83,20 +85,22 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
 
     msg_hdl_add_key2fct(&msg_hdl, "adsr", set_adsr_values, (void*)&adsr_values);
     msg_hdl_add_key2fct(&msg_hdl, "vol", set_float_value, (void*)&vol);
-//    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg, (void*)&midi_msg);
-    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg_in_map, (void*)&midi_msg_map);
+    // TODO tone_handler
+    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", (void (*)(void*, void*))set_tone, (void*)&tone_handler);
 
     while(thread_stuff->is_running) {
         msg_hdling(&msg_hdl, &thread_stuff->model_msg_queue);
         msg_hdling(&msg_hdl, &thread_stuff->jack_stuff->midi_msg_queue);
 
         size_t num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_audio);
-        float data_buf[1024];
+        float signal_sum_buf[1024];
+        float signal_prod_buf[1024];
 
         if(num_bytes < 4800 * sizeof(float))
         {
             adsr_length = 0;
             /* TODO need to handle polyphonic MidiMsgs
+            // TODO in future
             synth_model_envelope_update(synth_model,
                                         adsr_values.attack,
                                         adsr_values.decay,
@@ -105,25 +109,35 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                                         //is_play_pressed);
                                         midi_msg.is_on);
 
-            // TODO
-            synth_model_update(synth_model,
-                               data_buf,
-                               vol,
-                               // insert key2freq equation here:
-                               440.0 * pow(2.0, (midi_msg.key - 33.0)/12.0),
-                               &adsr_height,
-                               &adsr_length);
             */
+            // for all synth models in
+            int synth_model_length = tone_handler_len(&tone_handler);
+            if(synth_model_length > 0) {
+                for(size_t i = 0; i < synth_model_length; ++i) {
+                    synth_model_process(&tone_handler.tone_map[i].value,
+                                        signal_sum_buf,
+                                        signal_prod_buf,
+                                        vol,
+                                        &adsr_height,
+                                        &adsr_length);
+                    /* TODO Idea on struct {key, adsr_length, adsr_height}
+                    int ret_adsr_height = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_height", (void*)&adsr_height, sizeof(float));
+                    int ret_adsr_length = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_length", (void*)&adsr_length, sizeof(float));
+                    */
+                }
+            }
+            // TODO Volume on databuf
 
             // TODO msg send in better function
-            int ret_adsr_height = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_height", (void*)&adsr_height, sizeof(float));
-            int ret_adsr_length = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_length", (void*)&adsr_length, sizeof(float));
 
             int ret_midi_msg = lf_queue_push(&thread_stuff->raylib_msg_queue, "midi_msg", (void*)&midi_msg, sizeof(MidiMsg));
+            for(size_t i = 0; i < 1024; ++i) {
+                signal_sum_buf[i] -= signal_prod_buf[i];
+            }
 
-            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_audio, (void *)data_buf, 1024*sizeof(float));
+            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_audio, (void *)signal_sum_buf, 1024*sizeof(float));
             size_t num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_video);
-            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_video, (void *)data_buf, 1024*sizeof(float));
+            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_video, (void *)signal_sum_buf, 1024*sizeof(float));
             num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_video);
         } else {
             usleep(2000);
