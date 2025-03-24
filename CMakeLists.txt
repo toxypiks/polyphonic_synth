@@ -253,6 +253,7 @@ target_include_directories(msg_handler
 # model_gen_signal library
 set(MODEL_GEN_SIGNAL_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/model_gen_signal.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/tone_handler.c
   ${CMAKE_CURRENT_SOURCE_DIR}/include/model_gen_signal.h
 )
 
@@ -271,6 +272,7 @@ target_link_libraries(model_gen_signal
   synth_model
   msg_handler
   midi_msg
+  m
 )
 
 set(HASH_MAP_TEST_SRC

@@ -13,9 +13,10 @@ SynthModel* create_synth_model() {
   //TODO: init osc and envelop
   return synth_model;
 }
+
+// TODO length of tone_buf as parameter
 void synth_model_process(SynthModel* synth_model,
-                         float* signal_sum_buffer,
-                         float* signal_prod_buffer,
+                         float* tone_buf,
                          float new_vol,
                          float* adsr_current_value,
                          float* adsr_length
@@ -25,7 +26,7 @@ void synth_model_process(SynthModel* synth_model,
 
   // TODO handle volume control
   //change_amp(&synth_model->osc, new_vol);
-  gen_signal_in_buf(&synth_model->osc,  signal_sum_buffer, signal_prod_buffer, 1024, &synth_model->adsr_envelop);
+  gen_signal_in_buf(&synth_model->osc, tone_buf, 1024, &synth_model->adsr_envelop);
   *adsr_current_value = synth_model->adsr_envelop.current_value;
 
   // calculate adsr x,y0,y1 values

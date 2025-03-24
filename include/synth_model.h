@@ -12,8 +12,7 @@ typedef struct SynthModel{
 SynthModel* create_synth_model();
 
 void synth_model_process(SynthModel* synth_model,
-                         float* signal_sum_buffer,
-                         float* signal_prod_buffer,
+                         float* tone_buf,
                          float new_vol,
                          float* adsr_current_value,
                          float* adsr_length

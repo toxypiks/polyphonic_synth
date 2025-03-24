@@ -14,6 +14,6 @@ typedef struct Oscillator {
 
 void change_frequency(Oscillator* osc, float new_freq);
 void change_amp(Oscillator* osc, float new_amp);
-void gen_signal_in_buf(Oscillator* osc, float* sum_buf, float* prod_buf, size_t buf_length, Envelop* adsr_envelop);
+void gen_signal_in_buf(Oscillator* osc, float* buf, size_t buf_length, Envelop* adsr_envelop);
 
 #endif // OSCILLATOR_H_

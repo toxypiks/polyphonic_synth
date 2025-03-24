@@ -43,13 +43,13 @@ void set_midi_msg_in_map(void* midi_msg_new_raw, void* midi_msg_map_raw)
 void print_hash_map(MidiMsgMap* midi_msg_map)
 {
     int midi_msg_map_len = hmlen(midi_msg_map);
-    printf("midi_msg_map %d items\n",midi_msg_map_len);
+    printf("print_hash_print(): midi_msg_map %d items\n",midi_msg_map_len);
     if (midi_msg_map_len > 0) {
         for (size_t i = 0; i < midi_msg_map_len; ++i) {
             printf("key: %d, is on: %d\n", midi_msg_map[i].key, midi_msg_map[i].value.is_on);
         }
     } else {
-        printf("nothing\n");
+        printf("print_hash_print(): nothing in the hashmap\n");
     }
 }
 
@@ -86,17 +86,16 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
     msg_hdl_add_key2fct(&msg_hdl, "adsr", set_adsr_values, (void*)&adsr_values);
     msg_hdl_add_key2fct(&msg_hdl, "vol", set_float_value, (void*)&vol);
     // TODO tone_handler
-    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", (void (*)(void*, void*))set_tone, (void*)&tone_handler);
+    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_tone_wrapper, (void*)&tone_handler);
 
     while(thread_stuff->is_running) {
         msg_hdling(&msg_hdl, &thread_stuff->model_msg_queue);
         msg_hdling(&msg_hdl, &thread_stuff->jack_stuff->midi_msg_queue);
 
         size_t num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_audio);
-        float signal_sum_buf[1024];
-        float signal_prod_buf[1024];
+        float signal_buf[1024];
 
-        if(num_bytes < 4800 * sizeof(float))
+        if (num_bytes < 4800 * sizeof(float))
         {
             adsr_length = 0;
             /* TODO need to handle polyphonic MidiMsgs
@@ -111,15 +110,29 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
 
             */
             // for all synth models in
+            float tone_buf[1024];
             int synth_model_length = tone_handler_len(&tone_handler);
-            if(synth_model_length > 0) {
-                for(size_t i = 0; i < synth_model_length; ++i) {
+            // printf("model_gen_signal(): synth_model_length: %d\n", synth_model_length);
+            if (synth_model_length > 0) {
+                for (size_t i = 0; i < synth_model_length; ++i) {
+                    memset(tone_buf, 0, sizeof(1024));
                     synth_model_process(&tone_handler.tone_map[i].value,
-                                        signal_sum_buf,
-                                        signal_prod_buf,
+                                        tone_buf,
                                         vol,
                                         &adsr_height,
                                         &adsr_length);
+                    if (i == 0) {
+                        for (size_t j = 0; j < 1024; j++) {
+                            signal_buf[j] = tone_buf[j];
+                        }
+                    } else {
+                        for (size_t j = 0; j < 1024; j++) {
+                            // MIX = A + B - A*B
+                            signal_buf[j] = tone_buf[j] + signal_buf[j]
+                                            - tone_buf[j]*signal_buf[j];
+                        }
+                    }
+                    // printf("model_gen_signal(): finish signal generation of i:%d\n", i);
                     /* TODO Idea on struct {key, adsr_length, adsr_height}
                     int ret_adsr_height = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_height", (void*)&adsr_height, sizeof(float));
                     int ret_adsr_length = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_length", (void*)&adsr_length, sizeof(float));
@@ -131,18 +144,15 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
             // TODO msg send in better function
 
             int ret_midi_msg = lf_queue_push(&thread_stuff->raylib_msg_queue, "midi_msg", (void*)&midi_msg, sizeof(MidiMsg));
-            for(size_t i = 0; i < 1024; ++i) {
-                signal_sum_buf[i] -= signal_prod_buf[i];
-            }
 
-            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_audio, (void *)signal_sum_buf, 1024*sizeof(float));
+            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_audio, (void *)signal_buf, 1024*sizeof(float));
             size_t num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_video);
-            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_video, (void *)signal_sum_buf, 1024*sizeof(float));
+            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_video, (void *)signal_buf, 1024*sizeof(float));
             num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_video);
         } else {
             usleep(2000);
         }
-        print_hash_map(midi_msg_map);
+        // print_hash_map(midi_msg_map);
     }
     hmfree(midi_msg_map);
     synth_model_clear(synth_model);
