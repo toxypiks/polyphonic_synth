@@ -21,7 +21,8 @@ void gen_signal_in_buf(Oscillator* osc, float* buf, size_t buf_length, Envelop* 
   float new_phase = 0.0f;
   for(size_t i = 0; i < buf_length; ++i) {
     float phase = fmod((2.0*M_PI*osc->freq*i/48000.0f + osc->phase), 2.0*M_PI);
-    float value = osc->amp[i] * sin(phase);
+    // float value = osc->amp[i] * sin(phase);
+    float value = sin(phase);
     buf[i] = value;
     new_phase = phase;
   }

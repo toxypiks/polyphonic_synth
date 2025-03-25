@@ -138,7 +138,11 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                     int ret_adsr_length = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_length", (void*)&adsr_length, sizeof(float));
                     */
                 }
+            } else {
+                memset(signal_buf, 0, sizeof(1024));
             }
+
+            tone_handler_cleanup(&tone_handler);
             // TODO Volume on databuf
 
             // TODO msg send in better function
@@ -146,9 +150,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
             int ret_midi_msg = lf_queue_push(&thread_stuff->raylib_msg_queue, "midi_msg", (void*)&midi_msg, sizeof(MidiMsg));
 
             jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_audio, (void *)signal_buf, 1024*sizeof(float));
-            size_t num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_video);
             jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_video, (void *)signal_buf, 1024*sizeof(float));
-            num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_video);
         } else {
             usleep(2000);
         }

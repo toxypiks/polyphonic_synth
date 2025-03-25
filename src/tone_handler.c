@@ -42,3 +42,14 @@ int tone_handler_len(ToneHandler *tone_handler)
 {
     return hmlen(tone_handler->tone_map);
 }
+
+void tone_handler_cleanup(ToneHandler *tone_handler) {
+    int length = tone_handler_len(tone_handler);
+    if(length < 0) return;
+    for (int i = 0; i < length; ++i) {
+        if(!tone_handler->tone_map[i].value.osc.is_on){
+            int key = tone_handler->tone_map[i].key;
+            hmdel(tone_handler->tone_map, key);
+        }
+    }
+}
