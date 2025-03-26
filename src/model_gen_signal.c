@@ -128,8 +128,8 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                     } else {
                         for (size_t j = 0; j < 1024; j++) {
                             // MIX = A + B - A*B
-                            signal_buf[j] = tone_buf[j] + signal_buf[j]
-                                            - tone_buf[j]*signal_buf[j];
+                            signal_buf[j] = 0.1*(tone_buf[j] + signal_buf[j]
+                                            - tone_buf[j]*signal_buf[j]);
                         }
                     }
                     // printf("model_gen_signal(): finish signal generation of i:%d\n", i);
@@ -139,7 +139,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                     */
                 }
             } else {
-                memset(signal_buf, 0, sizeof(1024));
+                memset(signal_buf, 0, 1024*sizeof(float));
             }
 
             tone_handler_cleanup(&tone_handler);
