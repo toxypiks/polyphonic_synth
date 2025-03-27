@@ -69,6 +69,7 @@ int main(void) {
     msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg, (void*)&midi_msg_in);
 
     size_t virt_keyboard_key = 0;
+    size_t virt_keyboard_key_prev = 0;
     float virt_keyboard_freq = 0;
 
     float custom_color[4] = {1.0, 0.0, 1.0, 0.4};
@@ -96,9 +97,14 @@ int main(void) {
         int ret_vol = lf_queue_push(&thread_stuff->model_msg_queue, "vol", (void*)&ui_stuff->text.vol, sizeof(float));
 
         // TODO check if polyphon affects this
+        printf("virt_keyboard: is_on_prev: %d is_on: %d key: %d\n",
+               is_virt_keyboard_on_prev,
+               is_virt_keyboard_on,
+               virt_keyboard_key);
         if (is_virt_keyboard_on != is_virt_keyboard_on_prev) {
             MidiMsg midi_msg_out = {
-                .key  = virt_keyboard_key + octave*12,
+                .key  = is_virt_keyboard_on ? virt_keyboard_key + octave*12
+                                            : virt_keyboard_key_prev + octave*12,
                 .vel   = 1.0,
                 .is_on = is_virt_keyboard_on,
                 .time_stamp = 0
@@ -145,6 +151,8 @@ int main(void) {
         float dummy_adsr_length = 0.0;
         adsr_widget(layout_stack_slot(&ls), &ui_stuff->adsr, dummy_adsr_height, dummy_adsr_length);
         is_virt_keyboard_on_prev = is_virt_keyboard_on;
+        virt_keyboard_key_prev = virt_keyboard_key;
+
         // TODO translate to poly midi msgs
         size_t dummy_key;
         bool dummy_pressed;
