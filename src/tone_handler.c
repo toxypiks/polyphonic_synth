@@ -16,7 +16,7 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
         SynthModel synth_model = {
             .osc = {
                 .amp = {0.0f},
-                .freq = 440.0 * pow(2.0, ((float)key - 33.0)/12.0),
+                .freq = 440.0 * pow(2.0, ((float)key - 69.0)/12.0),
                 .phase = 0.0f,
                 .vel = midi_msg_new->vel,
                 .is_on = midi_msg_new->is_on,
@@ -32,6 +32,7 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
                 .release = 0.3f
             }
         };
+        printf("key : %d, freq: %f\n", key, synth_model.osc.freq);
         hmput(tone_handler->tone_map, key, synth_model);
     } else {
         tone_handler->tone_map[index].value.osc.is_on = midi_msg_new->is_on;
