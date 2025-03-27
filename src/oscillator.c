@@ -28,7 +28,7 @@ void gen_signal_in_buf(Oscillator* osc, float* buf, size_t buf_length, Envelop* 
   }
   osc->phase = new_phase;
   // to refactor envelop
-  // envelop_apply_in_buf(adsr_envelop, buf, buf_length);
+  envelop_apply_in_buf(adsr_envelop, buf, buf_length);
 
   // check if phase is NaN
   if (osc->phase != osc->phase) {
