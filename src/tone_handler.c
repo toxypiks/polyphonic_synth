@@ -53,3 +53,16 @@ void tone_handler_cleanup(ToneHandler *tone_handler) {
         }
     }
 }
+
+void print_hash_map(ToneHandler *tone_handler)
+{
+    int tone_handler_len = hmlen(tone_handler->tone_map);
+    printf("print_hash_print(): tone_handler %d items\n",tone_handler_len);
+    if (tone_handler_len > 0) {
+        for (size_t i = 0; i < tone_handler_len; ++i) {
+            printf("key: %d, is on: %d\n", tone_handler->tone_map[i].key, tone_handler->tone_map[i].value.osc.is_on);
+        }
+    } else {
+        printf("print_hash_print(): nothing in the hashmap\n");
+    }
+}

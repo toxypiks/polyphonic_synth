@@ -15,44 +15,6 @@
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
 
-typedef struct MidiMsgMap {
-    int key;
-    MidiMsg value;
-} MidiMsgMap;
-
-void set_midi_msg_in_map(void* midi_msg_new_raw, void* midi_msg_map_raw)
-{
-    MidiMsgMap** midi_msg_map = midi_msg_map_raw;
-    // get key from midi_msg
-    MidiMsg* midi_msg_new = midi_msg_new_raw;
-    int key = midi_msg_new->key;
-
-    // is it a new key?
-    int index = hmgeti(*midi_msg_map, key);
-    printf("set_midi_msg_in_map index: %d \n", index);
-    if (index < 0) {
-        // create new entry
-        hmput(*midi_msg_map, key, *midi_msg_new);
-    } else {
-        (*midi_msg_map)[index].value.is_on = midi_msg_new->is_on;
-    }
-    // TODO delete???
-    // tomorrow :)
-}
-
-void print_hash_map(MidiMsgMap* midi_msg_map)
-{
-    int midi_msg_map_len = hmlen(midi_msg_map);
-    printf("print_hash_print(): midi_msg_map %d items\n",midi_msg_map_len);
-    if (midi_msg_map_len > 0) {
-        for (size_t i = 0; i < midi_msg_map_len; ++i) {
-            printf("key: %d, is on: %d\n", midi_msg_map[i].key, midi_msg_map[i].value.is_on);
-        }
-    } else {
-        printf("print_hash_print(): nothing in the hashmap\n");
-    }
-}
-
 void set_adsr_values(void* adsr_new_raw, void* adsr_values_raw)
 {
     ADSR* adsr_values = (ADSR*)adsr_values_raw;
@@ -74,9 +36,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
     float freq = 0.0;
     bool is_play_pressed = false;
 
-    // TODO need MIDI msg hash map
     MidiMsg midi_msg = {0};
-    MidiMsgMap* midi_msg_map = NULL;
     ToneHandler tone_handler = { .tone_map = NULL };
 
     MsgHdl msg_hdl = {0};
@@ -127,9 +87,9 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                         }
                     } else {
                         for (size_t j = 0; j < 1024; j++) {
-                            // MIX = A + B - A*B
-                            signal_buf[j] = 0.1*(tone_buf[j] + signal_buf[j]
-                                            - tone_buf[j]*signal_buf[j]);
+                            // TODO: Better MIX
+                            // bad formula= A + B - A*B
+                            signal_buf[j] = (tone_buf[j] + signal_buf[j]) * 0.5;
                         }
                     }
                     // printf("model_gen_signal(): finish signal generation of i:%d\n", i);
@@ -154,9 +114,8 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
         } else {
             usleep(2000);
         }
-        // print_hash_map(midi_msg_map);
     }
-    hmfree(midi_msg_map);
+    // TODO free tone handler
     synth_model_clear(synth_model);
     printf("model_gen_signal_thread ended, Good bye! \n");
     return NULL;
