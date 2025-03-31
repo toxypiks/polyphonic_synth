@@ -28,6 +28,9 @@ void synth_model_process(SynthModel* synth_model,
   //change_amp(&synth_model->osc, new_vol);
   gen_signal_in_buf(&synth_model->osc, tone_buf, 1024, &synth_model->adsr_envelop);
   *adsr_current_value = synth_model->adsr_envelop.current_value;
+  if ((*adsr_current_value <= 0.0) && (synth_model->adsr_envelop.envelop_state == DEFAULT)){
+      synth_model->osc.is_end = true;
+  }
 
   // calculate adsr x,y0,y1 values
   sum_ads = (synth_model->adsr_envelop.attack + synth_model->adsr_envelop.decay + synth_model->adsr_envelop.sustain_length);
@@ -59,7 +62,7 @@ void synth_model_envelope_update(SynthModel* synth_model,
 {
     // TODO: signal state via ringbuffer
     envelop_change_adsr(&synth_model->adsr_envelop,attack, decay, sustain, release);
-    envelop_trigger(&synth_model->adsr_envelop,is_triggered);
+    envelop_trigger(&synth_model->adsr_envelop, is_triggered);
 }
 
 

@@ -96,11 +96,6 @@ int main(void) {
 
         int ret_vol = lf_queue_push(&thread_stuff->model_msg_queue, "vol", (void*)&ui_stuff->text.vol, sizeof(float));
 
-        // TODO check if polyphon affects this
-        printf("virt_keyboard: is_on_prev: %d is_on: %d key: %d\n",
-               is_virt_keyboard_on_prev,
-               is_virt_keyboard_on,
-               virt_keyboard_key);
         if (is_virt_keyboard_on != is_virt_keyboard_on_prev) {
             MidiMsg midi_msg_out = {
                 .key  = is_virt_keyboard_on ? virt_keyboard_key + octave*12

@@ -13,6 +13,7 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
     int index = hmgeti(tone_handler->tone_map, key);
     if (index < 0) {
         // create new entry
+        // TODO create constructor
         SynthModel synth_model = {
             .osc = {
                 .amp = {0.0f},
@@ -20,6 +21,7 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
                 .phase = 0.0f,
                 .vel = midi_msg_new->vel,
                 .is_on = midi_msg_new->is_on,
+                .is_end = false
             },
             .adsr_envelop = {
                 .envelop_state = PRESSED_ATTACK,
@@ -44,11 +46,26 @@ int tone_handler_len(ToneHandler *tone_handler)
     return hmlen(tone_handler->tone_map);
 }
 
+void tone_handler_retrigger(ToneHandler *tone_handler) {
+    int length = tone_handler_len(tone_handler);
+    if(length <= 0) return;
+    for (int i = 0; i < length; ++i) {
+        bool is_triggered = tone_handler->tone_map[i].value.osc.is_on;
+        envelop_trigger(&tone_handler->tone_map[i].value.adsr_envelop, is_triggered);
+    }
+}
+
 void tone_handler_cleanup(ToneHandler *tone_handler) {
     int length = tone_handler_len(tone_handler);
     if(length < 0) return;
     for (int i = 0; i < length; ++i) {
-        if(!tone_handler->tone_map[i].value.osc.is_on){
+        int key = tone_handler->tone_map[i].key;
+        printf("th_cleanup():length: %d, key: %d, is_on: %d, is_end: %d\n",
+               length,
+               key,
+               tone_handler->tone_map[i].value.osc.is_on,
+               tone_handler->tone_map[i].value.osc.is_end);
+        if(tone_handler->tone_map[i].value.osc.is_end){
             int key = tone_handler->tone_map[i].key;
             hmdel(tone_handler->tone_map, key);
         }

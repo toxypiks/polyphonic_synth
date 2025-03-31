@@ -55,6 +55,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
         size_t num_bytes = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_audio);
         float signal_buf[1024];
 
+        tone_handler_retrigger(&tone_handler);
         if (num_bytes < 4800 * sizeof(float))
         {
             adsr_length = 0;

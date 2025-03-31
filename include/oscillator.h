@@ -10,6 +10,7 @@ typedef struct Oscillator {
   float phase;
   float vel;
   bool is_on;
+  bool is_end;
 } Oscillator;
 
 void change_frequency(Oscillator* osc, float new_freq);
