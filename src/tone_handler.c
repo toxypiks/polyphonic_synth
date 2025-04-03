@@ -8,6 +8,12 @@ void set_tone_wrapper(void* midi_msg_new_raw, void* tone_handler_raw){
     set_tone(midi_msg_new, tone_handler);
 }
 
+void set_adsr_wrapper(void* adsr_msg_raw, void* tone_handler_raw) {
+    ToneHandler* tone_handler = tone_handler_raw;
+    ADSR* adsr_msg = adsr_msg_raw;
+    set_adsr(tone_handler, adsr_msg);
+}
+
 void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
     int key = midi_msg_new->key;
     int index = hmgeti(tone_handler->tone_map, key);
@@ -28,10 +34,10 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
                 .sample_count = 0,
                 .sample_count_release = 0,
                 .current_value = 0.0f,
-                .attack = 0.05f, // TODO take set values
-                .decay = 0.15f,
-                .sustain = 0.5f,
-                .release = 0.3f
+                .attack = tone_handler->adsr_default.attack,
+                .decay = tone_handler->adsr_default.decay,
+                .sustain = tone_handler->adsr_default.sustain,
+                .release = tone_handler->adsr_default.release
             }
         };
         printf("key : %d, freq: %f\n", key, synth_model.osc.freq);
@@ -39,6 +45,13 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
     } else {
         tone_handler->tone_map[index].value.osc.is_on = midi_msg_new->is_on;
     }
+}
+
+void set_adsr(ToneHandler* tone_handler, ADSR* adsr_msg) {
+    tone_handler->adsr_default.attack = adsr_msg->attack;
+    tone_handler->adsr_default.decay = adsr_msg->decay;
+    tone_handler->adsr_default.sustain = adsr_msg->sustain;
+    tone_handler->adsr_default.release = adsr_msg->release;
 }
 
 int tone_handler_len(ToneHandler *tone_handler)

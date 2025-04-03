@@ -43,9 +43,9 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
     float adsr_height = 0.0;
     float adsr_length = 0.0;
 
-    msg_hdl_add_key2fct(&msg_hdl, "adsr", set_adsr_values, (void*)&adsr_values);
+    // msg_hdl_add_key2fct(&msg_hdl, "adsr", set_adsr_values, (void*)&adsr_values);
+    msg_hdl_add_key2fct(&msg_hdl, "adsr", set_adsr_wrapper, (void*)&tone_handler);
     msg_hdl_add_key2fct(&msg_hdl, "vol", set_float_value, (void*)&vol);
-    // TODO tone_handler
     msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_tone_wrapper, (void*)&tone_handler);
 
     while(thread_stuff->is_running) {
