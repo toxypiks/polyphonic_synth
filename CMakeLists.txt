@@ -103,21 +103,30 @@ target_link_libraries(jack_stuff
   ${JACK_LIBRARIES}
   )
 
+set(ADSR_DISPLAY_HANDLER_SRC
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/adsr_display_handler.c
+)
+add_library(adsr_display_handler)
+target_sources(adsr_display_handler
+ PRIVATE
+  ${ADSR_DISPLAY_HANDLER_SRC}
+)
+  
 set(POLYPHONIC_SYNTH_SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/polyphonic_synth.c
-  )
+)
 
 add_executable(polyphonic_synth)
 target_sources(polyphonic_synth
  PRIVATE
   ${POLYPHONIC_SYNTH_SRC}
-  )
+)
 
 target_include_directories(polyphonic_synth
-  PRIVATE
+ PRIVATE
   ${raylib_INCLUDE_DIRS}
   ${JACK_INCLUDE_DIRS}
-  )
+)
 
 target_link_libraries(polyphonic_synth
   ${raylib_LIBRARIES}
@@ -132,6 +141,7 @@ target_link_libraries(polyphonic_synth
   thread_stuff
   model_gen_signal
   lf_queue
+  adsr_display_handler
   )
 
 set(UI_STUFF_SOURCES

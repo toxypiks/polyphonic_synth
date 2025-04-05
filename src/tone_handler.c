@@ -73,11 +73,6 @@ void tone_handler_cleanup(ToneHandler *tone_handler) {
     if(length < 0) return;
     for (int i = 0; i < length; ++i) {
         int key = tone_handler->tone_map[i].key;
-        printf("th_cleanup():length: %d, key: %d, is_on: %d, is_end: %d\n",
-               length,
-               key,
-               tone_handler->tone_map[i].value.osc.is_on,
-               tone_handler->tone_map[i].value.osc.is_end);
         if(tone_handler->tone_map[i].value.osc.is_end){
             int key = tone_handler->tone_map[i].key;
             hmdel(tone_handler->tone_map, key);

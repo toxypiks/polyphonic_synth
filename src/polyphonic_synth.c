@@ -15,6 +15,7 @@
 #include "lf_queue.h"
 #include "msg_handler.h"
 #include "midi_msg.h"
+#include "adsr_display_handler.h"
 
 int main(void) {
 
@@ -63,9 +64,9 @@ int main(void) {
     // TODO somehing like a hashmap for multiple MidiMsgs
     // improve set_midi_msg
     MidiMsg midi_msg_in = {0};
+    ADSRDisplayHandler adsr_display_handler = {.adsr_display_map = NULL};
 
-    msg_hdl_add_key2fct(&msg_hdl, "adsr_height", set_float_value, (void*)&adsr_height);
-    msg_hdl_add_key2fct(&msg_hdl, "adsr_length", set_float_value, (void*)&adsr_length);
+    msg_hdl_add_key2fct(&msg_hdl, "adsr_display_msg", set_adsr_display_wrapper, (void*)&adsr_display_handler);
     msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg, (void*)&midi_msg_in);
 
     size_t virt_keyboard_key = 0;
@@ -144,6 +145,7 @@ int main(void) {
         // need poly adsr height/length
         float dummy_adsr_height = 0.0;
         float dummy_adsr_length = 0.0;
+
         adsr_widget(layout_stack_slot(&ls), &ui_stuff->adsr, dummy_adsr_height, dummy_adsr_length);
         is_virt_keyboard_on_prev = is_virt_keyboard_on;
         virt_keyboard_key_prev = virt_keyboard_key;

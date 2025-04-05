@@ -19,8 +19,8 @@ void synth_model_process(SynthModel* synth_model,
                          float* tone_buf,
                          float new_vol,
                          float* adsr_current_value,
-                         float* adsr_length
-  ) {
+                         float* adsr_length)
+{
   float sum_ads = 0.0f;
   float sum_adsr = 0.0f;
 

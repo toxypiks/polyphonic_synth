@@ -11,6 +11,7 @@
 #include "midi_msg.h"
 #include <math.h>
 #include "tone_handler.h"
+#include "adsr_display_msg.h"
 
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
@@ -40,10 +41,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
     ToneHandler tone_handler = { .tone_map = NULL };
 
     MsgHdl msg_hdl = {0};
-    float adsr_height = 0.0;
-    float adsr_length = 0.0;
 
-    // msg_hdl_add_key2fct(&msg_hdl, "adsr", set_adsr_values, (void*)&adsr_values);
     msg_hdl_add_key2fct(&msg_hdl, "adsr", set_adsr_wrapper, (void*)&tone_handler);
     msg_hdl_add_key2fct(&msg_hdl, "vol", set_float_value, (void*)&vol);
     msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_tone_wrapper, (void*)&tone_handler);
@@ -58,30 +56,19 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
         tone_handler_retrigger(&tone_handler);
         if (num_bytes < 4800 * sizeof(float))
         {
-            adsr_length = 0;
-            /* TODO need to handle polyphonic MidiMsgs
-            // TODO in future
-            synth_model_envelope_update(synth_model,
-                                        adsr_values.attack,
-                                        adsr_values.decay,
-                                        adsr_values.sustain,
-                                        adsr_values.release,
-                                        //is_play_pressed);
-                                        midi_msg.is_on);
-
-            */
-            // for all synth models in
             float tone_buf[1024];
             int synth_model_length = tone_handler_len(&tone_handler);
-            // printf("model_gen_signal(): synth_model_length: %d\n", synth_model_length);
+
             if (synth_model_length > 0) {
                 for (size_t i = 0; i < synth_model_length; ++i) {
+                    ADSRDisplayMsg adsr_display_msg = {0};
                     memset(tone_buf, 0, sizeof(1024));
                     synth_model_process(&tone_handler.tone_map[i].value,
                                         tone_buf,
                                         vol,
-                                        &adsr_height,
-                                        &adsr_length);
+                                        &adsr_display_msg.adsr_height,
+                                        &adsr_display_msg.adsr_length);
+                    adsr_display_msg.key = tone_handler.tone_map[i].key;
                     if (i == 0) {
                         for (size_t j = 0; j < 1024; j++) {
                             signal_buf[j] = tone_buf[j];
@@ -93,11 +80,8 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                             signal_buf[j] = (tone_buf[j] + signal_buf[j]) * 0.5;
                         }
                     }
-                    // printf("model_gen_signal(): finish signal generation of i:%d\n", i);
-                    /* TODO Idea on struct {key, adsr_length, adsr_height}
-                    int ret_adsr_height = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_height", (void*)&adsr_height, sizeof(float));
-                    int ret_adsr_length = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_length", (void*)&adsr_length, sizeof(float));
-                    */
+                    int ret_adsr = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_display_msg", (void*)&adsr_display_msg, sizeof(ADSRDisplayMsg));
+
                 }
             } else {
                 memset(signal_buf, 0, 1024*sizeof(float));
