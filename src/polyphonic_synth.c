@@ -33,8 +33,6 @@ int main(void) {
     }
 
     // adsr view Ui stuff and model
-    float adsr_height = 0.0f;
-    float adsr_length = 0.0f;
 
     JackStuff* jack_stuff = create_jack_stuff("SineWaveWithJack", 192000);
     ThreadStuff* thread_stuff = create_thread_stuff(jack_stuff);
@@ -77,6 +75,7 @@ int main(void) {
 
     while(!WindowShouldClose()) {
         msg_hdling(&msg_hdl, &thread_stuff->raylib_msg_queue);
+        print_adsr_display_hash_map(&adsr_display_handler);
 
         // TODO ~Setter for text ->better update for ui_stuff
         // TODO Seperate value for label from actual parameter for change frequency

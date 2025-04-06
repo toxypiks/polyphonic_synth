@@ -80,7 +80,7 @@ void tone_handler_cleanup(ToneHandler *tone_handler) {
     }
 }
 
-void print_hash_map(ToneHandler *tone_handler)
+void print_tone_handler_hash_map(ToneHandler *tone_handler)
 {
     int tone_handler_len = hmlen(tone_handler->tone_map);
     printf("print_hash_print(): tone_handler %d items\n",tone_handler_len);
