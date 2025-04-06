@@ -16,6 +16,7 @@
 #include "msg_handler.h"
 #include "midi_msg.h"
 #include "adsr_display_handler.h"
+#include "stb_ds.h"
 
 int main(void) {
 
@@ -63,6 +64,9 @@ int main(void) {
     // improve set_midi_msg
     MidiMsg midi_msg_in = {0};
     ADSRDisplayHandler adsr_display_handler = {.adsr_display_map = NULL};
+    float* adsr_heights = NULL;
+    float* adsr_lengths = NULL;
+    // TODO set capicity
 
     msg_hdl_add_key2fct(&msg_hdl, "adsr_display_msg", set_adsr_display_wrapper, (void*)&adsr_display_handler);
     msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg, (void*)&midi_msg_in);
@@ -76,6 +80,18 @@ int main(void) {
     while(!WindowShouldClose()) {
         msg_hdling(&msg_hdl, &thread_stuff->raylib_msg_queue);
         print_adsr_display_hash_map(&adsr_display_handler);
+
+        // copy adsr display msgs to dynamic array
+
+        int adsr_display_map_len = hmlen(adsr_display_handler.adsr_display_map);
+        arrfree(adsr_lengths);
+        arrfree(adsr_heights);
+        if( adsr_display_map_len > 0) {
+            for (size_t i = 0; i < adsr_display_map_len; ++i) {
+                arrpush(adsr_lengths, adsr_display_handler.adsr_display_map[i].value.adsr_length);
+                arrpush(adsr_heights, adsr_display_handler.adsr_display_map[i].value.adsr_height);
+            }
+        }
 
         // TODO ~Setter for text ->better update for ui_stuff
         // TODO Seperate value for label from actual parameter for change frequency
@@ -192,10 +208,14 @@ int main(void) {
             ui_stuff->adsr.sustain.scroll = 0.5f;
             ui_stuff->adsr.release.scroll = 0.2;
         }
+        // TODO clean adsr_display_handler
     }
     layout_stack_delete(&ls);
     CloseWindow();
     ffmpeg_end_rendering(&ffmpeg_stuff);
+    arrfree(adsr_lengths);
+    arrfree(adsr_heights);
+    // TODO free adsr_display_handler
 
     thread_stuff->is_running = false;
     pthread_join(model_gen_signal_thread, NULL);
