@@ -271,76 +271,81 @@ void signal_widget(UiRect r, RayOutBuffer *ray_out_buffer, Color c)
   }
 }
 
-void adsr_display_widget(UiRect rect, UiADSR *adsr, Color c, float adsr_height, float adsr_width_raw) {
-  float adsr_width = MIN(adsr_width_raw, 1.0);
-  float x = rect.x;
-  float y = rect.y;
-  float w = rect.w;
-  float h = rect.h;
-  float sum = adsr->attack.scroll + adsr->decay.scroll + 0.5 + adsr->release.scroll;
-  float al  = adsr->attack.scroll / sum;
-  float dl  = adsr->decay.scroll/sum;
-  float sl  = 0.5 / sum;
-  float rl  = adsr->release.scroll / sum;
-  float s   = adsr->sustain.scroll;
-  Vector2 p0 = {0.0f + x         , 1.0f * h + y};
-  Vector2 p1 = {al *w + x        , 0.0f + y };
-  Vector2 p2 = {(al+dl)*w + x    , (1.0f - s)*h + y};
-  Vector2 p3 = {(al+dl+sl)*w + x , (1.0f - s)*h + y};
-  Vector2 p4 = {1.0f*w + x       , 1.0f*h + y};
-  DrawLineV(p0, p1, c);
-  DrawLineV(p1, p2, c);
-  DrawLineV(p2, p3, c);
-  DrawLineV(p3, p4, c);
-  DrawLineV(p0, p4, WHITE);
+void adsr_display_widget(UiRect rect, UiADSR *adsr, Color c, float *adsr_heights, float *adsr_widths_raw, int adsr_arr_len) {
 
-  Vector2 progress_p0 = {adsr_width * w + x, 1.0f*h + y};
-  Vector2 progress_p1 = {adsr_width * w + x, (1 - adsr_height) * h + y};
-  float thick = w * 0.010f;
-  float surrounding = 2.5f * thick;
-  Rectangle rec = {
-    .x = progress_p0.x - surrounding,
-    .y = progress_p1.y - surrounding,
-    .width = 2.0f * surrounding,
-    .height = surrounding + progress_p0.y - progress_p1.y,
-  };
+    float x = rect.x;
+    float y = rect.y;
+    float w = rect.w;
+    float h = rect.h;
+    float sum = adsr->attack.scroll + adsr->decay.scroll + 0.5 + adsr->release.scroll;
+    float al  = adsr->attack.scroll / sum;
+    float dl  = adsr->decay.scroll/sum;
+    float sl  = 0.5 / sum;
+    float rl  = adsr->release.scroll / sum;
+    float s   = adsr->sustain.scroll;
+    Vector2 p0 = {0.0f + x         , 1.0f * h + y};
+    Vector2 p1 = {al *w + x        , 0.0f + y };
+    Vector2 p2 = {(al+dl)*w + x    , (1.0f - s)*h + y};
+    Vector2 p3 = {(al+dl+sl)*w + x , (1.0f - s)*h + y};
+    Vector2 p4 = {1.0f*w + x       , 1.0f*h + y};
+    DrawLineV(p0, p1, c);
+    DrawLineV(p1, p2, c);
+    DrawLineV(p2, p3, c);
+    DrawLineV(p3, p4, c);
+    DrawLineV(p0, p4, WHITE);
 
-  Rectangle tip = {
-    .x = progress_p1.x - surrounding,
-    .y = progress_p1.y - surrounding,
-    .width = 2.0f * surrounding,
-    .height = 2.0f * surrounding,
-  };
+    for(size_t i = 0; i < adsr_arr_len; ++i) {
+        float adsr_width = MIN(adsr_widths_raw[i], 1.0);
+        float adsr_height = adsr_heights[i];
+        Vector2 progress_p0 = {adsr_width * w + x, 1.0f*h + y};
+        Vector2 progress_p1 = {adsr_width * w + x, (1 - adsr_height) * h + y};
 
-  Texture2D texture = { rlGetTextureIdDefault(), 1, 1, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8};
+        float thick = w * 0.010f;
+        float surrounding = 2.5f * thick;
+        Rectangle rec = {
+            .x = progress_p0.x - surrounding,
+            .y = progress_p1.y - surrounding,
+            .width = 2.0f * surrounding,
+            .height = surrounding + progress_p0.y - progress_p1.y,
+        };
 
+        Rectangle tip = {
+            .x = progress_p1.x - surrounding,
+            .y = progress_p1.y - surrounding,
+            .width = 2.0f * surrounding,
+            .height = 2.0f * surrounding,
+        };
+        Texture2D texture = { rlGetTextureIdDefault(), 1, 1, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8};
 
-  BeginShaderMode(adsr->circ_shader);
-  Rectangle source = {0.0f, 0.0f, 1.0f, 1.0f};
-  Vector2 origin = { 0.0f, 0.0f };
-  DrawTexturePro(texture, source, tip, origin, 0.0, BLUE);
-  EndShaderMode();
+        BeginShaderMode(adsr->circ_shader);
+        Rectangle source = {0.0f, 0.0f, 1.0f, 1.0f};
+        Vector2 origin = { 0.0f, 0.0f };
+        DrawTexturePro(texture, source, tip, origin, 0.0, BLUE);
+        EndShaderMode();
 
-  BeginShaderMode(adsr->rec_shader);
-  DrawTexturePro(texture, source, rec, origin, 0.0, BLUE);
-  EndShaderMode();
+        BeginShaderMode(adsr->rec_shader);
+        DrawTexturePro(texture, source, rec, origin, 0.0, BLUE);
+        EndShaderMode();
 
-  DrawLineEx(progress_p0, progress_p1, thick, MAGENTA);
+        DrawLineEx(progress_p0, progress_p1, thick, MAGENTA);
+    }
 }
 
-void adsr_widget(UiRect rect, UiADSR *adsr, float adsr_height, float adsr_width)
+void adsr_widget(UiRect rect, UiADSR *adsr, float* adsr_height, float* adsr_width, int adsr_arr_len)
 {
-  LayoutStack ls = {0};
-  layout_stack_push(&ls, LO_VERT, rect, 2, 0);
-  adsr_display_widget(layout_stack_slot(&ls), adsr, BLUE, adsr_height, adsr_width);
-  layout_stack_push(&ls, LO_HORZ, rect, 4, 0);
-  slider_widget(layout_stack_slot(&ls), &(adsr->attack));
-  slider_widget(layout_stack_slot(&ls), &(adsr->decay));
-  slider_widget(layout_stack_slot(&ls), &(adsr->sustain));
-  slider_widget(layout_stack_slot(&ls), &(adsr->release));
-  layout_stack_pop(&ls);
-  layout_stack_pop(&ls);
-  layout_stack_delete(&ls);
+    LayoutStack ls = {0};
+    layout_stack_push(&ls, LO_VERT, rect, 2, 0);
+    if( adsr_arr_len > 0) {
+        adsr_display_widget(layout_stack_slot(&ls), adsr, BLUE, adsr_height, adsr_width, adsr_arr_len);
+    }
+    layout_stack_push(&ls, LO_HORZ, rect, 4, 0);
+    slider_widget(layout_stack_slot(&ls), &(adsr->attack));
+    slider_widget(layout_stack_slot(&ls), &(adsr->decay));
+    slider_widget(layout_stack_slot(&ls), &(adsr->sustain));
+    slider_widget(layout_stack_slot(&ls), &(adsr->release));
+    layout_stack_pop(&ls);
+    layout_stack_pop(&ls);
+    layout_stack_delete(&ls);
 }
 
 void octave_widget(UiRect rect,

@@ -86,7 +86,7 @@ int main(void) {
         int adsr_display_map_len = hmlen(adsr_display_handler.adsr_display_map);
         arrfree(adsr_lengths);
         arrfree(adsr_heights);
-        if( adsr_display_map_len > 0) {
+        if(adsr_display_map_len > 0) {
             for (size_t i = 0; i < adsr_display_map_len; ++i) {
                 arrpush(adsr_lengths, adsr_display_handler.adsr_display_map[i].value.adsr_length);
                 arrpush(adsr_heights, adsr_display_handler.adsr_display_map[i].value.adsr_height);
@@ -157,11 +157,7 @@ int main(void) {
         signal_widget(layout_stack_slot(&ls), &ray_out_buffer, BLUE);
         layout_stack_push(&ls, LO_HORZ, layout_stack_slot(&ls), 3, 0);
 
-        // need poly adsr height/length
-        float dummy_adsr_height = 0.0;
-        float dummy_adsr_length = 0.0;
-
-        adsr_widget(layout_stack_slot(&ls), &ui_stuff->adsr, dummy_adsr_height, dummy_adsr_length);
+        adsr_widget(layout_stack_slot(&ls), &ui_stuff->adsr, adsr_heights, adsr_lengths, adsr_display_map_len);
         is_virt_keyboard_on_prev = is_virt_keyboard_on;
         virt_keyboard_key_prev = virt_keyboard_key;
 
