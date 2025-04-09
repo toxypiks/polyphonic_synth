@@ -20,6 +20,17 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
     if (index < 0) {
         // create new entry
         // TODO create constructor
+        float attack = tone_handler->adsr_default.attack;
+        float decay = tone_handler->adsr_default.decay;
+        float sustain = tone_handler->adsr_default.sustain;
+        float release = tone_handler->adsr_default.release;
+
+        float sum = attack + decay + 0.5f + release;
+        float al  = attack / sum;
+        float dl  = decay / sum;
+        float sl  = 0.5f / sum;
+        float rl  = release / sum;
+
         SynthModel synth_model = {
             .osc = {
                 .amp = {0.0f},
@@ -34,10 +45,11 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
                 .sample_count = 0,
                 .sample_count_release = 0,
                 .current_value = 0.0f,
-                .attack = tone_handler->adsr_default.attack,
-                .decay = tone_handler->adsr_default.decay,
-                .sustain = tone_handler->adsr_default.sustain,
-                .release = tone_handler->adsr_default.release
+                .attack = al,
+                .decay = dl,
+                .sustain = sustain,
+                .release = rl,
+                .sustain_length = sl
             }
         };
         printf("key : %d, freq: %f\n", key, synth_model.osc.freq);
