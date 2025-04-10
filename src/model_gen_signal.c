@@ -54,8 +54,7 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
         float signal_buf[1024];
 
         tone_handler_retrigger(&tone_handler);
-        if (num_bytes < 4800 * sizeof(float))
-        {
+        if (num_bytes < 4800 * sizeof(float)) {
             float tone_buf[1024];
             int synth_model_length = tone_handler_len(&tone_handler);
 
@@ -70,14 +69,14 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
                                         &adsr_display_msg.adsr_length);
                     adsr_display_msg.key = tone_handler.tone_map[i].key;
                     if (i == 0) {
-                        for (size_t j = 0; j < 1024; j++) {
+                        for (size_t j = 0; j < 1024; ++j) {
                             signal_buf[j] = tone_buf[j];
                         }
                     } else {
-                        for (size_t j = 0; j < 1024; j++) {
+                        for (size_t j = 0; j < 1024; ++j) {
                             // TODO: Better MIX
                             // bad formula= A + B - A*B
-                            signal_buf[j] = (tone_buf[j] + signal_buf[j]) * 0.5;
+                            signal_buf[j] = (tone_buf[j] + signal_buf[j])*0.5f;
                         }
                     }
                     int ret_adsr = lf_queue_push(&thread_stuff->raylib_msg_queue, "adsr_display_msg", (void*)&adsr_display_msg, sizeof(ADSRDisplayMsg));

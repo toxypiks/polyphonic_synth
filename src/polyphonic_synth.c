@@ -116,7 +116,7 @@ int main(void) {
             MidiMsg midi_msg_out = {
                 .key  = is_virt_keyboard_on ? virt_keyboard_key + octave*12
                                             : virt_keyboard_key_prev + octave*12,
-                .vel   = 1.0,
+                .vel   = 1.0f,
                 .is_on = is_virt_keyboard_on,
                 .time_stamp = 0
             };
@@ -155,7 +155,7 @@ int main(void) {
         oct_trans_button_widget(layout_stack_slot(&ls), &octave, &is_left_oct_pressed, &is_right_oct_pressed);
         layout_stack_pop(&ls);
         signal_widget(layout_stack_slot(&ls), &ray_out_buffer, BLUE);
-        layout_stack_push(&ls, LO_HORZ, layout_stack_slot(&ls), 3, 0);
+        layout_stack_push(&ls, LO_HORZ, layout_stack_slot(&ls),3,0);
 
         adsr_widget(layout_stack_slot(&ls), &ui_stuff->adsr, adsr_heights, adsr_lengths, adsr_display_map_len);
         is_virt_keyboard_on_prev = is_virt_keyboard_on;
@@ -167,22 +167,19 @@ int main(void) {
         size_t dummy_key_in = 0;
         bool dummy_pressed_in = false;
         octave_widget(layout_stack_slot(&ls),
-                      // &dummy_key,
                       &virt_keyboard_key,
-                      // &dummy_pressed,
                       &is_virt_keyboard_on,
                       dummy_key_in,
                       dummy_pressed_in);
 
         slider_widget(layout_stack_slot(&ls), &ui_stuff->slider_vol);
-        //slider_widget(layout_stack_slot(&ls), &ui_stuff->slider_freq);
 
         layout_stack_pop(&ls);
         layout_stack_pop(&ls);
         EndTextureMode();
 
         Vector2 pos_rect = {0,0};
-        Rectangle flip_rect = {0, 0, screen_width, -1 * (int)screen_height};
+        Rectangle flip_rect = {0, 0, screen_width, - 1*(int)screen_height};
 
         DrawTextureRec(ui_stuff->screen.texture,
         flip_rect,
@@ -198,11 +195,11 @@ int main(void) {
 
         UnloadImage(image);
 
-        if(is_reset_pressed) {
+        if (is_reset_pressed) {
             ui_stuff->adsr.attack.scroll = 0.05f;
             ui_stuff->adsr.decay.scroll = 0.25f;
             ui_stuff->adsr.sustain.scroll = 0.5f;
-            ui_stuff->adsr.release.scroll = 0.2;
+            ui_stuff->adsr.release.scroll = 0.2f;
         }
         // TODO clean adsr_display_handler
     }
