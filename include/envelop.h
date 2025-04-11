@@ -25,7 +25,7 @@ typedef struct Envelop {
 } Envelop;
 
 void envelop_trigger(Envelop *envelop, bool is_pressed);
-
+void set_evelope(Envelop *envelop, float attack, float decay, float sustain, float release);
 void envelop_change_adsr(Envelop *envelop, float attack, float decay, float sustain, float release);
 
 void envelop_apply_in_buf(Envelop *envelop, float* buf, size_t buf_length);

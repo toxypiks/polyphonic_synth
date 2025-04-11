@@ -5,6 +5,7 @@
 
 #define EPS 0.0001f
 
+
 void envelop_trigger(Envelop *envelop, bool is_pressed)
 {
   if (is_pressed && (envelop->envelop_state == RELEASED || envelop->envelop_state == DEFAULT)) {
@@ -16,6 +17,17 @@ void envelop_trigger(Envelop *envelop, bool is_pressed)
   if (!is_pressed && envelop->envelop_state != DEFAULT) {
       envelop->envelop_state = RELEASED;
   }
+}
+
+void set_evelope(Envelop *envelop, float attack, float decay, float sustain, float release)
+{
+    // initial state
+    envelop->envelop_state = PRESSED_ATTACK;
+    envelop->sample_count = 0;
+    envelop->sample_count_release = 0;
+    envelop->current_value = 0.0f;
+    // add normalized values
+    envelop_change_adsr(envelop, attack, decay, sustain, release);
 }
 
 void envelop_change_adsr(Envelop *envelop, float attack, float decay, float sustain, float release)
@@ -38,9 +50,9 @@ void envelop_apply_in_buf(Envelop *envelop, float* buf, size_t buf_length)
   float attack_step_size = 1.0f/(48000.0f*envelop->attack);
   float decay_step_size = - (1.0f - envelop->sustain)/(48000.0f*envelop->decay);
   float sustain_step_size = 0.0f;
-  float release_step_size = - (1.0f*envelop->sustain)/(48000.0f*envelop->release);
+  float release_step_size = - (1.0f*envelop->sustain - 0.0f)/(48000.0f*envelop->release);
 
-  float step_size[4] = {attack_step_size, decay_step_size, sustain_step_size, release_step_size};
+  float step_size[5] = {0.0f, attack_step_size, decay_step_size, sustain_step_size, release_step_size};
   // TODO! overthink current_value and envelop->current_value
   // TODO! why do we need a step?
   float current_value = 0.0f;
@@ -49,7 +61,7 @@ void envelop_apply_in_buf(Envelop *envelop, float* buf, size_t buf_length)
      || envelop->envelop_state == PRESSED_SUSTAIN) {
     size_t step = 0;
     for (size_t i = 0; i < buf_length; ++i) {
-        current_value = step*step_size[envelop->envelop_state - 1] + envelop->current_value;
+        current_value = step*step_size[envelop->envelop_state] + envelop->current_value;
         //TODO edge cases!
         if (envelop->envelop_state == PRESSED_ATTACK && current_value >= 1.0f) {
             current_value = 1.0f;
@@ -69,8 +81,8 @@ void envelop_apply_in_buf(Envelop *envelop, float* buf, size_t buf_length)
       envelop->sample_count += buf_length;
   } else if (envelop->envelop_state == RELEASED) {
       for (size_t i = 0; i < buf_length; ++i) {
-          current_value = MAX((i * release_step_size + envelop->current_value), 0.0f);
-          buf[i] = current_value * buf[i];
+          current_value = MAX((i*release_step_size + envelop->current_value), 0.0f);
+          buf[i] = current_value*buf[i];
           if (current_value <= 0.00000001f) {
               envelop->envelop_state = DEFAULT;
               envelop->sample_count = 0;

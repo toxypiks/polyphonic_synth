@@ -18,41 +18,19 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
     int key = midi_msg_new->key;
     int index = hmgeti(tone_handler->tone_map, key);
     if (index < 0) {
-        // create new entry
-        // TODO create constructor
-        float attack = tone_handler->adsr_default.attack;
-        float decay = tone_handler->adsr_default.decay;
-        float sustain = tone_handler->adsr_default.sustain;
-        float release = tone_handler->adsr_default.release;
+        SynthModel synth_model = {0};
+        set_oscillator(&synth_model.osc,
+                       440.0f * pow(2.0f, ((float)key - 69.0f)/12.0f),
+                       0.0f,
+                       midi_msg_new->vel,
+                       midi_msg_new->is_on,
+                       false);
 
-        float sum = attack + decay + 0.5f + release;
-        float al  = attack / sum;
-        float dl  = decay / sum;
-        float sl  = 0.5f / sum;
-        float rl  = release / sum;
-
-        SynthModel synth_model = {
-            .osc = {
-                .amp = {0.0f},
-                .freq = 440.0 * pow(2.0, ((float)key - 69.0)/12.0),
-                .phase = 0.0f,
-                .vel = midi_msg_new->vel,
-                .is_on = midi_msg_new->is_on,
-                .is_end = false
-            },
-            .adsr_envelop = {
-                .envelop_state = PRESSED_ATTACK,
-                .sample_count = 0,
-                .sample_count_release = 0,
-                .current_value = 0.0f,
-                .attack = al,
-                .decay = dl,
-                .sustain = sustain,
-                .release = rl,
-                .sustain_length = sl
-            }
-        };
-        printf("key : %d, freq: %f\n", key, synth_model.osc.freq);
+        set_evelope(&synth_model.adsr_envelop,
+                    tone_handler->adsr_default.attack,
+                    tone_handler->adsr_default.decay,
+                    tone_handler->adsr_default.sustain,
+                    tone_handler->adsr_default.release);
         hmput(tone_handler->tone_map, key, synth_model);
     } else {
         tone_handler->tone_map[index].value.osc.is_on = midi_msg_new->is_on;

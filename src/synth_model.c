@@ -28,6 +28,7 @@ void synth_model_process(SynthModel* synth_model,
   // TODO handle volume control
   //change_amp(&synth_model->osc, new_vol);
   gen_signal_in_buf(&synth_model->osc, tone_buf, 1024, &synth_model->adsr_envelop);
+  // TODO enveolop should be processed here
   *adsr_current_value = synth_model->adsr_envelop.current_value;
   if ((*adsr_current_value <= 0.0f) && (synth_model->adsr_envelop.envelop_state == DEFAULT)){
       synth_model->osc.is_end = true;

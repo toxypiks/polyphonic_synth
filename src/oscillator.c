@@ -2,6 +2,20 @@
 #include <math.h>
 #include "envelop.h"
 
+void set_oscillator(Oscillator *osc,
+                    float freq,
+                    float phase,
+                    float vel,
+                    bool is_on,
+                    bool is_end)
+{
+    osc->freq   = freq;
+    osc->phase  = phase;
+    osc->vel    = vel;
+    osc->is_on  = is_on;
+    osc->is_end = is_end;
+}
+
 void change_frequency(Oscillator* osc, float new_freq)
 {
   osc->freq = new_freq;
