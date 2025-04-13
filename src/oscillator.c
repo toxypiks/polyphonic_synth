@@ -30,7 +30,7 @@ void change_amp(Oscillator* osc, float new_amp)
   }
 }
 
-void gen_signal_in_buf(Oscillator* osc, float* buf, size_t buf_length, Envelop* adsr_envelop)
+void gen_signal_in_buf(Oscillator* osc, float* buf, size_t buf_length)
 {
   float new_phase = 0.0f;
   for(size_t i = 0; i < buf_length; ++i) {
@@ -40,8 +40,6 @@ void gen_signal_in_buf(Oscillator* osc, float* buf, size_t buf_length, Envelop* 
     new_phase = phase;
   }
   osc->phase = new_phase;
-  // to refactor envelop
-  envelop_apply_in_buf(adsr_envelop, buf, buf_length);
 
   // check if phase is NaN
   if (osc->phase != osc->phase) {
