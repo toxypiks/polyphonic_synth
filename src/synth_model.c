@@ -8,10 +8,8 @@ SynthModel* create_synth_model()
 {
   SynthModel* synth_model = (SynthModel*)malloc(sizeof(SynthModel));
   memset(synth_model->osc.amp, 1.0f, 1024);
-  synth_model->osc.freq = 440.0f;
-  synth_model->osc.phase = 0.0f;
-
-  //TODO: init osc and envelop
+  set_oscillator(&synth_model->osc, 440.0f, 0.0f, 0.0f, false, false);
+  set_evelope(&synth_model->adsr_envelop, 0.05f, 0.15f, 0.5f, 0.3f);
   return synth_model;
 }
 
@@ -56,19 +54,6 @@ void synth_model_process(SynthModel* synth_model,
                       + (synth_model->adsr_envelop.sample_count_release /(48000.0f));
   }
 }
-
-void synth_model_envelope_update(SynthModel* synth_model,
-                                 float attack,
-                                 float decay,
-                                 float sustain,
-                                 float release,
-                                 bool is_triggered)
-{
-    // TODO: signal state via ringbuffer
-    envelop_change_adsr(&synth_model->adsr_envelop,attack, decay, sustain, release);
-    envelop_trigger(&synth_model->adsr_envelop, is_triggered);
-}
-
 
 void synth_model_clear(SynthModel* synth_model)
 {
