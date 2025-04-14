@@ -55,15 +55,17 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
 
         tone_handler_retrigger(&tone_handler);
         if (num_bytes < 4800 * sizeof(float)) {
-            float tone_buf[1024];
+            const size_t tone_buf_size = 1024;
+            float tone_buf[tone_buf_size];
             int synth_model_length = tone_handler_len(&tone_handler);
 
             if (synth_model_length > 0) {
                 for (size_t i = 0; i < synth_model_length; ++i) {
                     ADSRDisplayMsg adsr_display_msg = {0};
-                    memset(tone_buf, 0, sizeof(1024));
+                    memset(tone_buf, 0, tone_buf_size*sizeof(float));
                     synth_model_process(&tone_handler.tone_map[i].value,
                                         tone_buf,
+                                        tone_buf_size,
                                         vol,
                                         &adsr_display_msg.adsr_height,
                                         &adsr_display_msg.adsr_length);

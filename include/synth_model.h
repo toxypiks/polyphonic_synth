@@ -13,6 +13,7 @@ SynthModel* create_synth_model();
 
 void synth_model_process(SynthModel* synth_model,
                          float* tone_buf,
+                         size_t tone_buf_size,
                          float new_vol,
                          float* adsr_current_value,
                          float* adsr_length);
