@@ -11,6 +11,7 @@ typedef struct Oscillator {
   float vel;
   bool is_on;
   bool is_end;
+  void (*func)(float, float, size_t, float*, float*);
 } Oscillator;
 
 void set_oscillator(Oscillator *osc, float freq, float phase, float vel, bool is_on, bool is_end);

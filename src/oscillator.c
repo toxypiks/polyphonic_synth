@@ -15,6 +15,7 @@ void set_oscillator(Oscillator *osc,
     osc->vel    = vel;
     osc->is_on  = is_on;
     osc->is_end = is_end;
+    osc->func = sine_wave;
 }
 
 void change_frequency(Oscillator* osc, float new_freq)
@@ -37,8 +38,8 @@ void gen_signal_in_buf(Oscillator* osc, float* buf, size_t buf_length)
   for(size_t i = 0; i < buf_length; ++i) {
     float phase = 0.0f;
     float value = 0.0f;
-    sine_wave(osc->freq, osc->phase, i, &phase, &value);
-    // TODO osc->gen_func(osc->freq, osc->phase, i, &phase, &value)
+    // sine_wave(osc->freq, osc->phase, i, &phase, &value);
+    osc->func(osc->freq, osc->phase, i, &phase, &value);
     buf[i] = value;
     new_phase = phase;
   }
