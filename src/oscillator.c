@@ -1,6 +1,7 @@
 #include "oscillator.h"
 #include <math.h>
 #include "envelop.h"
+#include "oscillator_func.h"
 
 void set_oscillator(Oscillator *osc,
                     float freq,
@@ -34,8 +35,10 @@ void gen_signal_in_buf(Oscillator* osc, float* buf, size_t buf_length)
 {
   float new_phase = 0.0f;
   for(size_t i = 0; i < buf_length; ++i) {
-    float phase = fmod((2.0f*M_PI*osc->freq*i/48000.0f + osc->phase), 2.0f*M_PI);
-    float value = sin(phase);
+    float phase = 0.0f;
+    float value = 0.0f;
+    sine_wave(osc->freq, osc->phase, i, &phase, &value);
+    // TODO osc->gen_func(osc->freq, osc->phase, i, &phase, &value)
     buf[i] = value;
     new_phase = phase;
   }

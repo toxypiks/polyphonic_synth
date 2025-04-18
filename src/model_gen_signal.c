@@ -101,8 +101,8 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
             usleep(2000);
         }
     }
-    // TODO free tone handler
     synth_model_clear(synth_model);
+    tone_handler_free_hashmap(&tone_handler);
     printf("model_gen_signal_thread ended, Good bye! \n");
     return NULL;
 }

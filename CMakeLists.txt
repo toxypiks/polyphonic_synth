@@ -32,6 +32,8 @@ target_include_directories(envelop
 set(OSCILLATOR_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/oscillator.c
   ${CMAKE_CURRENT_SOURCE_DIR}/include/oscillator.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/oscillator_func.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/oscillator_func.h
   )
 
 add_library(oscillator)

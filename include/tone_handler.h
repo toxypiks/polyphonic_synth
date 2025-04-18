@@ -26,4 +26,5 @@ void tone_handler_retrigger(ToneHandler *tone_handler);
 int tone_handler_len(ToneHandler *tone_handler);
 void print_tone_handler_hash_map(ToneHandler *tone_handler);
 void tone_handler_cleanup(ToneHandler *tone_handler);
+void tone_handler_free_hashmap(ToneHandler *tone_handler);
 #endif // TONE_HANDLER_H_

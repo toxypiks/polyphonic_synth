@@ -82,3 +82,7 @@ void print_tone_handler_hash_map(ToneHandler *tone_handler)
         printf("print_hash_print(): nothing in the hashmap\n");
     }
 }
+
+void tone_handler_free_hashmap(ToneHandler *tone_handler) {
+    hmfree(tone_handler->tone_map);
+}
