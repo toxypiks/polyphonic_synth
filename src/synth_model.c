@@ -8,7 +8,7 @@ SynthModel* create_synth_model()
 {
   SynthModel* synth_model = (SynthModel*)malloc(sizeof(SynthModel));
   memset(synth_model->osc.amp, 1.0f, 1024);
-  set_oscillator(&synth_model->osc, 440.0f, 0.0f, 0.0f, false, false, SINE_WAVE);
+  set_oscillator(&synth_model->osc, 440.0f, 0.0f, 0.0f, false, false, SQUARE_WAVE);
   set_evelope(&synth_model->adsr_envelop, 0.05f, 0.15f, 0.5f, 0.3f);
   return synth_model;
 }

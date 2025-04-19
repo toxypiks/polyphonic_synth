@@ -25,7 +25,7 @@ void set_tone(MidiMsg *midi_msg_new, ToneHandler *tone_handler) {
                        midi_msg_new->vel,
                        midi_msg_new->is_on,
                        false,
-                       SINE_WAVE);
+                       SQUARE_WAVE);
 
         set_evelope(&synth_model.adsr_envelop,
                     tone_handler->adsr_default.attack,

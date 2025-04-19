@@ -8,14 +8,16 @@ void set_oscillator(Oscillator *osc,
                     float phase,
                     float vel,
                     bool is_on,
-                    bool is_end)
+                    bool is_end,
+                    WAVE_FCT wave_fct)
 {
+
     osc->freq   = freq;
     osc->phase  = phase;
     osc->vel    = vel;
     osc->is_on  = is_on;
     osc->is_end = is_end;
-    osc->func = sine_wave;
+    osc->func = wave_fct_factory(wave_fct);
 }
 
 void change_frequency(Oscillator* osc, float new_freq)
