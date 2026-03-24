@@ -95,8 +95,13 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
 
             int ret_midi_msg = lf_queue_push(&thread_stuff->raylib_msg_queue, "midi_msg", (void*)&midi_msg, sizeof(MidiMsg));
 
+            // TODO: check capacity of buffer independently
             jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_audio, (void *)signal_buf, 1024*sizeof(float));
-            jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_video, (void *)signal_buf, 1024*sizeof(float));
+
+            size_t num_bytes_video = jack_ringbuffer_read_space(thread_stuff->jack_stuff->ringbuffer_video);
+            if(num_bytes_video < 8192*sizeof(float)){
+                jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_video, (void *)signal_buf, 1024*sizeof(float));
+            }
         } else {
             usleep(2000);
         }

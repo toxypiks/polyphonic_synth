@@ -28,6 +28,7 @@ void synth_model_process(SynthModel* synth_model,
   gen_signal_in_buf(&synth_model->osc, tone_buf, tone_buf_size);
   envelop_apply_in_buf(&synth_model->adsr_envelop, tone_buf, tone_buf_size);
 
+  // just adsr stuff below:
   *adsr_current_value = synth_model->adsr_envelop.current_value;
   if ((*adsr_current_value <= 0.0f) && (synth_model->adsr_envelop.envelop_state == DEFAULT)){
       synth_model->osc.is_end = true;
