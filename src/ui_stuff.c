@@ -351,7 +351,7 @@ void adsr_widget(UiRect rect, UiADSR *adsr, float* adsr_height, float* adsr_widt
 void octave_widget(UiRect rect,
                    size_t* key_out,
                    bool* pressed_out,
-                   size_t key_in,
+                   OctavePressedKeyMap* keys_map_in,
                    bool pressed_in)
 {
     float x = rect.x;
@@ -397,7 +397,11 @@ void octave_widget(UiRect rect,
    key_reverse_lookup[8] = 10;
    key_reverse_lookup[10] = 11;
 
-   int collision_key_in = key_reverse_lookup[key_in];
+   OctavePressedKeyMap *collision_keys_map_in = NULL;
+   for(size_t i = 0; i < hmlen(keys_map_in); i++) {
+       int collision_key_in = key_reverse_lookup[keys_map_in[i].key];
+       hmput(collision_keys_map_in, collision_key_in, true);
+   }
 
    Rectangle white_key = {0};
    Color white_key_c = BLACK;
@@ -447,8 +451,9 @@ void octave_widget(UiRect rect,
    // Drawing keys
    for(size_t i = 0; i < 7; ++i) {
        white_key.x =  i*white_key_w + x;
-       if(key_index == collision_key_in && pressed_in) {
-           DrawRectangleRec(white_key, RED);
+       // hmgetp_null schaut ob es den key gibt, wenn nein -> return NULL is wie false
+       if( hmgetp_null(collision_keys_map_in, key_index) && pressed_in) {
+           DrawRectangleRec(white_key, ColorBrightness(white_key_c, 0.75f));
        } else {
            DrawRectangleRec(white_key, white_key_c);
        }
@@ -464,7 +469,7 @@ void octave_widget(UiRect rect,
    for(size_t i = 0; i < 6; ++i) {
        if(i != 2) {
            black_key.x = i*white_key_w + x + 0.75*white_key_w;
-           if(key_index == collision_key_in && pressed_in) {
+           if( hmgetp_null(collision_keys_map_in, key_index) && pressed_in) {
                DrawRectangleRec(black_key, GREEN);
            } else {
               DrawRectangleRec(black_key, black_key_c);
@@ -488,6 +493,7 @@ void octave_widget(UiRect rect,
        *key_out = key_lookup[collision_key];
        *pressed_out = true;
    }
+   hmfree(collision_keys_map_in);
 }
 
 /*void keyboard_widget(UiRect rect) {

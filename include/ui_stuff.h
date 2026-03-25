@@ -5,6 +5,7 @@
 #include <raymath.h>
 #include <stddef.h>
 #include "ray_out_buffer.h"
+#include "stb_ds.h"
 
 #define DA_INIT_CAP 256
 #define da_append(da, item)                                                      \
@@ -79,6 +80,14 @@ typedef struct Text {
   float vol;
 } Text;
 
+// TODO just testing octave widget
+// copy this to ui stuff
+// for now dummy values
+typedef struct OctavePressedKeyMap {
+    int key;
+    bool value;
+} OctavePressedKeyMap;
+
 typedef struct UiStuff {
   RenderTexture2D screen;
   SliderState slider_vol;
@@ -102,7 +111,7 @@ void oct_trans_button_widget(UiRect r, int *octave, bool *left_is_pressed, bool 
 void signal_widget(UiRect r, RayOutBuffer *ray_out_buffer, Color c);
 void adsr_display_widget(UiRect rect, UiADSR *adsr, Color c, float *adsr_heights, float *adsr_widths_raw, int adsr_arr_len);
 void adsr_widget(UiRect rect, UiADSR *adsr, float* adsr_height, float* adsr_width, int adsr_arr_len);
-void octave_widget(UiRect rect, size_t* key, bool* pressed, size_t key_in, bool pressed_in);
+void octave_widget(UiRect rect, size_t* key_out, bool* pressed_out, OctavePressedKeyMap* keys_map_in, bool pressed_in);
 void text_widget(UiRect r, Text *text);
 
 

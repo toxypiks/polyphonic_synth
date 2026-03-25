@@ -18,6 +18,7 @@
 #include "adsr_display_handler.h"
 #include "stb_ds.h"
 
+
 int main(void) {
 
     FfmpegStuff ffmpeg_stuff = {0};
@@ -49,6 +50,10 @@ int main(void) {
 
     UiStuff* ui_stuff = create_ui_stuff(screen_width, screen_height);
     LayoutStack ls = {0};
+
+    // TODO: later use this in ui_stuff
+    // used in octave widget to highlight pressed keys
+    OctavePressedKeyMap* dummy_key_map_in = NULL;
 
     bool is_virt_keyboard_on = false;
     bool is_virt_keyboard_on_prev = false;
@@ -161,15 +166,16 @@ int main(void) {
         is_virt_keyboard_on_prev = is_virt_keyboard_on;
         virt_keyboard_key_prev = virt_keyboard_key;
 
-        // TODO translate to poly midi msgs
-        size_t dummy_key;
-        bool dummy_pressed;
-        size_t dummy_key_in = 0;
-        bool dummy_pressed_in = false;
+        // TODO translate to poly midi msgs into a list of keys
+        // to draw them
+
+        hmput(dummy_key_map_in, 0, true);
+        hmput(dummy_key_map_in, 3, true);
+        bool dummy_pressed_in = true;
         octave_widget(layout_stack_slot(&ls),
                       &virt_keyboard_key,
                       &is_virt_keyboard_on,
-                      dummy_key_in,
+                      dummy_key_map_in,
                       dummy_pressed_in);
 
         slider_widget(layout_stack_slot(&ls), &ui_stuff->slider_vol);
