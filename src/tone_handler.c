@@ -6,6 +6,11 @@ void set_tone_wrapper(void* midi_msg_new_raw, void* tone_handler_raw){
     MidiMsg *midi_msg_new = midi_msg_new_raw;
     ToneHandler *tone_handler = tone_handler_raw;
     set_tone(midi_msg_new, tone_handler);
+    // TODO: send midi msgs to ui
+    printf("send_midi_msg_to_ui key: %d, pressed: %d\n", midi_msg_new->key, midi_msg_new->is_on);
+    int ret_midi_msg = lf_queue_push(tone_handler->raylib_msg_queue, "midi_msg", (void*)midi_msg_new, sizeof(MidiMsg));
+
+
 }
 
 void set_adsr_wrapper(void* adsr_msg_raw, void* tone_handler_raw) {

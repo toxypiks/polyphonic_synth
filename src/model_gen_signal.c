@@ -38,7 +38,11 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
     bool is_play_pressed = false;
 
     MidiMsg midi_msg = {0};
-    ToneHandler tone_handler = { .tone_map = NULL };
+    ToneHandler tone_handler = {
+        .tone_map = NULL,
+        .adsr_default = {0},
+        .raylib_msg_queue = &(thread_stuff->raylib_msg_queue)
+    };
 
     MsgHdl msg_hdl = {0};
 
@@ -90,10 +94,6 @@ void* model_gen_signal_thread_fct(void* thread_stuff_raw)
 
             tone_handler_cleanup(&tone_handler);
             // TODO Volume on databuf
-
-            // TODO msg send in better function
-
-            int ret_midi_msg = lf_queue_push(&thread_stuff->raylib_msg_queue, "midi_msg", (void*)&midi_msg, sizeof(MidiMsg));
 
             // TODO: check capacity of buffer independently
             jack_ringbuffer_write(thread_stuff->jack_stuff->ringbuffer_audio, (void *)signal_buf, 1024*sizeof(float));

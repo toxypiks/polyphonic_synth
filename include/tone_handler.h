@@ -5,6 +5,7 @@
 #include "midi_msg.h"
 #include "adsr.h"
 #include "stb_ds.h"
+#include "lf_queue.h"
 
 typedef struct ToneMap {
     int key;
@@ -15,6 +16,8 @@ typedef struct ToneMap {
 typedef struct ToneHandler {
     ToneMap* tone_map;
     ADSR adsr_default;
+    // TODO dependency inversion/injection for midi send over queue
+    lf_queue_bss_state* raylib_msg_queue;
 } ToneHandler;
 
 void set_tone_wrapper(void* midi_msg_new_raw, void* tone_handler_raw);

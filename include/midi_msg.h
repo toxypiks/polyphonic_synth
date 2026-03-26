@@ -11,5 +11,6 @@ typedef struct MidiMsg {
 } MidiMsg;
 
 void set_midi_msg(void* midi_msg_new_raw, void* midi_msg_raw);
+void set_midi_msgs_in_hmap(void* midi_msg_new_raw, void* key_map_raw);
 
 #endif // MIDI_MSG_H_

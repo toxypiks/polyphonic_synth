@@ -51,10 +51,6 @@ int main(void) {
     UiStuff* ui_stuff = create_ui_stuff(screen_width, screen_height);
     LayoutStack ls = {0};
 
-    // TODO: later use this in ui_stuff
-    // used in octave widget to highlight pressed keys
-    OctavePressedKeyMap* dummy_key_map_in = NULL;
-
     bool is_virt_keyboard_on = false;
     bool is_virt_keyboard_on_prev = false;
     bool is_reset_pressed = false;
@@ -65,16 +61,16 @@ int main(void) {
     int octave = 3;
 
     MsgHdl msg_hdl = {0};
-    // TODO somehing like a hashmap for multiple MidiMsgs
-    // improve set_midi_msg
-    MidiMsg midi_msg_in = {0};
+    // TODO: later use this in ui_stuff
+    // used in octave widget to highlight pressed keys
+    OctavePressedKeyMap* dummy_key_map_in = NULL;
     ADSRDisplayHandler adsr_display_handler = {.adsr_display_map = NULL};
     float* adsr_heights = NULL;
     float* adsr_lengths = NULL;
     // TODO set capicity
 
     msg_hdl_add_key2fct(&msg_hdl, "adsr_display_msg", set_adsr_display_wrapper, (void*)&adsr_display_handler);
-    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msg, (void*)&midi_msg_in);
+    msg_hdl_add_key2fct(&msg_hdl, "midi_msg", set_midi_msgs_in_hmap, (void*)&dummy_key_map_in);
 
     size_t virt_keyboard_key = 0;
     size_t virt_keyboard_key_prev = 0;
@@ -83,6 +79,7 @@ int main(void) {
     float custom_color[4] = {1.0, 0.0, 1.0, 0.4};
 
     while(!WindowShouldClose()) {
+        // msg handler receives msgs from model
         msg_hdling(&msg_hdl, &thread_stuff->raylib_msg_queue);
         print_adsr_display_hash_map(&adsr_display_handler);
 
@@ -165,12 +162,6 @@ int main(void) {
         adsr_widget(layout_stack_slot(&ls), &ui_stuff->adsr, adsr_heights, adsr_lengths, adsr_display_map_len);
         is_virt_keyboard_on_prev = is_virt_keyboard_on;
         virt_keyboard_key_prev = virt_keyboard_key;
-
-        // TODO translate to poly midi msgs into a list of keys
-        // to draw them
-
-        hmput(dummy_key_map_in, 0, true);
-        hmput(dummy_key_map_in, 3, true);
 
         octave_widget(layout_stack_slot(&ls),
                       &virt_keyboard_key,

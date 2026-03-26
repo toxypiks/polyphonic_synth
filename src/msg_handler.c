@@ -30,7 +30,7 @@ void msg_hdling(MsgHdl* msg_hdl, lf_queue_bss_state* msg_queue)
         for (size_t i = 0; i < msg_hdl->nkeys; ++i) {
             if (strcmp(key, msg_hdl->key2fct[i].key) == 0) {
                 msg_hdl->key2fct[i].fct(value,
-                msg_hdl->key2fct[i].datastruct);
+                                        msg_hdl->key2fct[i].datastruct);
             }
         }
         free(key);
