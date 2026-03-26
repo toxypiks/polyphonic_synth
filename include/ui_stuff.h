@@ -111,7 +111,7 @@ void oct_trans_button_widget(UiRect r, int *octave, bool *left_is_pressed, bool 
 void signal_widget(UiRect r, RayOutBuffer *ray_out_buffer, Color c);
 void adsr_display_widget(UiRect rect, UiADSR *adsr, Color c, float *adsr_heights, float *adsr_widths_raw, int adsr_arr_len);
 void adsr_widget(UiRect rect, UiADSR *adsr, float* adsr_height, float* adsr_width, int adsr_arr_len);
-void octave_widget(UiRect rect, size_t* key_out, bool* pressed_out, OctavePressedKeyMap* keys_map_in, bool pressed_in);
+void octave_widget(UiRect rect, size_t* key_out, bool* pressed_out, OctavePressedKeyMap* keys_map_in);
 void text_widget(UiRect r, Text *text);
 
 

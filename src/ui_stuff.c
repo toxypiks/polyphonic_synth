@@ -351,8 +351,7 @@ void adsr_widget(UiRect rect, UiADSR *adsr, float* adsr_height, float* adsr_widt
 void octave_widget(UiRect rect,
                    size_t* key_out,
                    bool* pressed_out,
-                   OctavePressedKeyMap* keys_map_in,
-                   bool pressed_in)
+                   OctavePressedKeyMap* keys_map_in)
 {
     float x = rect.x;
     float y = rect.y;
@@ -452,7 +451,7 @@ void octave_widget(UiRect rect,
    for(size_t i = 0; i < 7; ++i) {
        white_key.x =  i*white_key_w + x;
        // hmgetp_null schaut ob es den key gibt, wenn nein -> return NULL is wie false
-       if( hmgetp_null(collision_keys_map_in, key_index) && pressed_in) {
+       if (hmgetp_null(collision_keys_map_in, key_index)) {
            DrawRectangleRec(white_key, ColorBrightness(white_key_c, 0.75f));
        } else {
            DrawRectangleRec(white_key, white_key_c);
@@ -466,10 +465,10 @@ void octave_widget(UiRect rect,
        DrawLineV(p0, p1, BLUE);
    }
 
-   for(size_t i = 0; i < 6; ++i) {
-       if(i != 2) {
+   for (size_t i = 0; i < 6; ++i) {
+       if (i != 2) {
            black_key.x = i*white_key_w + x + 0.75*white_key_w;
-           if( hmgetp_null(collision_keys_map_in, key_index) && pressed_in) {
+           if (hmgetp_null(collision_keys_map_in, key_index)) {
                DrawRectangleRec(black_key, GREEN);
            } else {
               DrawRectangleRec(black_key, black_key_c);

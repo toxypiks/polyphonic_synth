@@ -171,12 +171,11 @@ int main(void) {
 
         hmput(dummy_key_map_in, 0, true);
         hmput(dummy_key_map_in, 3, true);
-        bool dummy_pressed_in = true;
+
         octave_widget(layout_stack_slot(&ls),
                       &virt_keyboard_key,
                       &is_virt_keyboard_on,
-                      dummy_key_map_in,
-                      dummy_pressed_in);
+                      dummy_key_map_in);
 
         slider_widget(layout_stack_slot(&ls), &ui_stuff->slider_vol);
 
