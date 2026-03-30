@@ -166,7 +166,8 @@ int main(void) {
         keyboard_widget(layout_stack_slot(&ls),
                       &virt_keyboard_key,
                       &is_virt_keyboard_on,
-                      dummy_key_map_in);
+                      dummy_key_map_in,
+                      octave);
 
         slider_widget(layout_stack_slot(&ls), &ui_stuff->slider_vol);
 

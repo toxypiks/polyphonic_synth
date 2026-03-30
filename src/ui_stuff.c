@@ -351,7 +351,8 @@ void adsr_widget(UiRect rect, UiADSR *adsr, float* adsr_height, float* adsr_widt
 void keyboard_widget(UiRect rect,
                      size_t* key_out,
                      bool* pressed_out,
-                     KeyboardPressedKeyMap* keys_map_in)
+                     KeyboardPressedKeyMap* keys_map_in,
+                     size_t octave)
 {
     float x = rect.x;
     float y = rect.y;
@@ -396,10 +397,13 @@ void keyboard_widget(UiRect rect,
    key_reverse_lookup[8] = 10;
    key_reverse_lookup[10] = 11;
 
+   size_t octave_offset = 12*octave;
    KeyboardPressedKeyMap *collision_keys_map_in = NULL;
    for(size_t i = 0; i < hmlen(keys_map_in); i++) {
-       int collision_key_in = key_reverse_lookup[keys_map_in[i].key];
-       hmput(collision_keys_map_in, collision_key_in, true);
+       if(octave_offset <= keys_map_in[i].key && keys_map_in[i].key < octave_offset + 12) {
+           int collision_key_in = key_reverse_lookup[(keys_map_in[i].key % 12)];
+           hmput(collision_keys_map_in, collision_key_in, true);
+       }
    }
 
    Rectangle white_key = {0};
