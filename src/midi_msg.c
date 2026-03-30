@@ -13,7 +13,7 @@ void set_midi_msg(void* midi_msg_new_raw, void* midi_msg_raw)
 
 void set_midi_msgs_in_hmap(void* midi_msg_new_raw, void* key_map_raw)
 {
-    OctavePressedKeyMap** key_map = (OctavePressedKeyMap**)key_map_raw;
+    KeyboardPressedKeyMap** key_map = (KeyboardPressedKeyMap**)key_map_raw;
     MidiMsg* midi_msg_new = (MidiMsg*)midi_msg_new_raw;
 
     int key = midi_msg_new->key;

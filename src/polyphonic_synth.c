@@ -63,7 +63,7 @@ int main(void) {
     MsgHdl msg_hdl = {0};
     // TODO: later use this in ui_stuff
     // used in octave widget to highlight pressed keys
-    OctavePressedKeyMap* dummy_key_map_in = NULL;
+    KeyboardPressedKeyMap* dummy_key_map_in = NULL;
     ADSRDisplayHandler adsr_display_handler = {.adsr_display_map = NULL};
     float* adsr_heights = NULL;
     float* adsr_lengths = NULL;
@@ -163,7 +163,7 @@ int main(void) {
         is_virt_keyboard_on_prev = is_virt_keyboard_on;
         virt_keyboard_key_prev = virt_keyboard_key;
 
-        octave_widget(layout_stack_slot(&ls),
+        keyboard_widget(layout_stack_slot(&ls),
                       &virt_keyboard_key,
                       &is_virt_keyboard_on,
                       dummy_key_map_in);

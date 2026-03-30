@@ -348,10 +348,10 @@ void adsr_widget(UiRect rect, UiADSR *adsr, float* adsr_height, float* adsr_widt
     layout_stack_delete(&ls);
 }
 
-void octave_widget(UiRect rect,
-                   size_t* key_out,
-                   bool* pressed_out,
-                   OctavePressedKeyMap* keys_map_in)
+void keyboard_widget(UiRect rect,
+                     size_t* key_out,
+                     bool* pressed_out,
+                     KeyboardPressedKeyMap* keys_map_in)
 {
     float x = rect.x;
     float y = rect.y;
@@ -396,7 +396,7 @@ void octave_widget(UiRect rect,
    key_reverse_lookup[8] = 10;
    key_reverse_lookup[10] = 11;
 
-   OctavePressedKeyMap *collision_keys_map_in = NULL;
+   KeyboardPressedKeyMap *collision_keys_map_in = NULL;
    for(size_t i = 0; i < hmlen(keys_map_in); i++) {
        int collision_key_in = key_reverse_lookup[keys_map_in[i].key];
        hmput(collision_keys_map_in, collision_key_in, true);
