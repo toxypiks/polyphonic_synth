@@ -116,8 +116,8 @@ int main(void) {
 
         if (is_virt_keyboard_on != is_virt_keyboard_on_prev) {
             MidiMsg midi_msg_out = {
-                .key  = is_virt_keyboard_on ? virt_keyboard_key + octave*12
-                                            : virt_keyboard_key_prev + octave*12,
+                .key  = is_virt_keyboard_on ? virt_keyboard_key
+                                            : virt_keyboard_key_prev,
                 .vel   = 1.0f,
                 .is_on = is_virt_keyboard_on,
                 .time_stamp = 0

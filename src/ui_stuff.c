@@ -493,7 +493,7 @@ void keyboard_widget(UiRect rect,
        *key_out = 0;
        *pressed_out = false;
    } else {
-       *key_out = key_lookup[collision_key];
+       *key_out = key_lookup[collision_key] + octave*12;
        *pressed_out = true;
    }
    hmfree(collision_keys_map_in);
